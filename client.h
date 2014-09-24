@@ -10,7 +10,6 @@
 #define __Cartotheque__client__
 
 #include <cstdio>
-#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -33,14 +32,16 @@ public:
 
     void send_request();
     void clean_response();
+    void url_encode();
+    void parse_response();
+    void print();
     void print_dirty();
-    
 
 private:
     int count;
     const char* site;
     const char* site_path;
-    std::string response;
+    std::string response, request;
 
     // Change the cout destination
     std::streambuf* oldCout;
