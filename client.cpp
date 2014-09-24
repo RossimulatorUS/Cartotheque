@@ -10,7 +10,6 @@
 
 #include "client.h"
 #include "lib/pugixml-1.4/src/pugixml.hpp"
-#include <unistd.h> // Add to resolve some linker errors
 
 // From https://code.google.com/p/twitcurl/source/browse/trunk/libtwitcurl/urlencode.cpp?r=47
 std::string char2hex( char dec )

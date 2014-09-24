@@ -45,6 +45,7 @@
 #include <cstring>
 #include <cstdarg>
 #include <assert.h>
+#include <unistd.h> // To avoid unknow symbol issues with libc++
 
 #include <string>
 #include <vector>
