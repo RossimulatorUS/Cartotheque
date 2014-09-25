@@ -16,6 +16,7 @@
 class way
 {
 public:
+    way(std::vector<node>);
 
 private:
     std::vector<node> path;

@@ -12,10 +12,15 @@
 class node
 {
 public:
+    node(double longitude, double lattitude) : x(longitude), y(lattitude){}
+    double longitude(){return x;}
+    double lattitude(){return y;}
+    void longtiude(double longitude){x = longitude;}
+    void lattitude(double lattitude){y = lattitude;}
 
 private:
-    double longitude;
-    double lattitude;
+    double x;
+    double y;
 };
 
 #endif /* defined(__Cartotheque__Node__) */

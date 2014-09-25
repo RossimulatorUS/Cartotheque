@@ -10,11 +10,12 @@
 #define __Cartotheque__client__
 
 #include <cstdio>
-#include <fstream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "lib/happyhttp/happyhttp.h"
+#include "Way.h"
 
 class client
 {
@@ -33,7 +34,9 @@ public:
     void send_request();
     void clean_response();
     void url_encode();
-    void parse_response();
+    void execute();
+    std::vector<way> parse_response();
+    
     void print();
     void print_dirty();
 

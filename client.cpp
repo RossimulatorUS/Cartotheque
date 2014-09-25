@@ -6,8 +6,9 @@
 //  Copyright (c) 2014 Rossimulatorus. All rights reserved.
 //
 
-#include <assert.h>
 #include <iostream>
+#include <vector>
+#include "Node.h"
 
 #include "client.h"
 #include "lib/pugixml-1.4/src/pugixml.hpp"
@@ -36,23 +37,27 @@ client::client(const char* site, const char* site_path) :
     url_encode();
 }
 
+// http://scumways.com/happyhttp/happyhttp.html
 void client::onBegin(const happyhttp::Response* r, void* userdata )
 {
     ((client*)userdata)->oldCout = std::cout.rdbuf();
     std::cout.rdbuf(((client*)userdata)->strCout.rdbuf());
 }
 
+// http://scumways.com/happyhttp/happyhttp.html
 void client::onData( const happyhttp::Response* r, void* userdata, const unsigned char* data, int n )
 {
     std::cout << data;
     ((client*)userdata)->count += n;
 }
 
+// http://scumways.com/happyhttp/happyhttp.html
 void client::onComplete( const happyhttp::Response* r, void* userdata )
 {
     std::cout.rdbuf(((client*)userdata)->oldCout);
 }
 
+// http://scumways.com/happyhttp/happyhttp.html
 void client::send_request()
 {
     happyhttp::Connection conn( site, 80 );
@@ -99,13 +104,37 @@ void client::url_encode()
     request = escaped;
 }
 
-void client::parse_response() // Fonctionne seulement pour certaines villes. Attention aux caracteres speciaux. Seattle fonctionne
+void client::execute()
 {
+    //url_encode();
+    send_request();
+    clean_response();
+}
+
+// http://pugixml.org
+std::vector<way> client::parse_response() // Attention aux caracteres speciaux. Seattle fonctionne
+{
+print();
     pugi::xml_document doc;
-    pugi::xml_parse_result result = doc.load_buffer(response.c_str(), response.size());
-    if (!result) return;
+    if (!doc.load_buffer(response.c_str(), response.size())) return std::vector<way>();
 
     // Parse the xml and store in data structure
+    pugi::xml_node noeud(doc.child("node"));
+    std::cout << noeud.attribute("id").value();
+    std::cout << noeud.text();
+
+    std::vector<way> ways;
+
+    // For each way
+    for (pugi::xml_node way = doc.child("node"); way; way = way.next_sibling("node"))
+    {
+        // Extract each node
+        std::cout << "Way : " << way.attribute("id").value() << "\n";
+    }
+    std::vector<node> path;
+
+
+    return ways;
 }
 
 void client::print()

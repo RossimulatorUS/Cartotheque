@@ -7,3 +7,8 @@
 //
 
 #include "Way.h"
+
+way::way(std::vector<node> path) : path(path)
+{
+
+}
