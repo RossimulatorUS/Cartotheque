@@ -6,6 +6,7 @@
 //  Copyright (c) 2014 Rossimulatorus. All rights reserved.
 //
 
+#include <assert.h>
 #include <iostream>
 
 #include "client.h"
@@ -43,7 +44,6 @@ void client::onBegin(const happyhttp::Response* r, void* userdata )
 
 void client::onData( const happyhttp::Response* r, void* userdata, const unsigned char* data, int n )
 {
-    //fwrite(data, 1, n, stdout);
     std::cout << data;
     ((client*)userdata)->count += n;
 }
@@ -99,12 +99,13 @@ void client::url_encode()
     request = escaped;
 }
 
-void client::parse_response()
+void client::parse_response() // Fonctionne seulement pour certaines villes. Attention aux caracteres speciaux. Seattle fonctionne
 {
     pugi::xml_document doc;
-    //pugi::xml_parse_result result = doc.load(response.c_str());
-    //if (result)
-    //    std::cout << "XML parsed without errors, attr value: [" << doc.child("node").attribute("attr").value() << "]\n\n";
+    pugi::xml_parse_result result = doc.load_buffer(response.c_str(), response.size());
+    if (!result) return;
+
+    // Parse the xml and store in data structure
 }
 
 void client::print()
