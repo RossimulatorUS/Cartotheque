@@ -12,6 +12,8 @@
 
 #include "client.h"
 #include "lib/pugixml-1.4/src/pugixml.hpp"
+#include <boost/network/protocol/http/client.hpp>
+#include <boost/network/uri.hpp>
 
 // From https://code.google.com/p/twitcurl/source/browse/trunk/libtwitcurl/urlencode.cpp?r=47
 std::string char2hex( char dec )
@@ -32,14 +34,18 @@ std::string char2hex( char dec )
 client::client(const char* site, const char* site_path) :
     count(0),
     site(site),
-    site_path(site_path)
+    site_path(site_path),
+    strCout(),
+    download_file()
 {
     url_encode();
+    //strCout.clear();
 }
 
 // http://scumways.com/happyhttp/happyhttp.html
 void client::onBegin(const happyhttp::Response* r, void* userdata )
 {
+    ((client*)userdata)->download_file.open("download.xml"); //, std::ofstream::trunc);
     ((client*)userdata)->oldCout = std::cout.rdbuf();
     std::cout.rdbuf(((client*)userdata)->strCout.rdbuf());
 }
@@ -47,14 +53,16 @@ void client::onBegin(const happyhttp::Response* r, void* userdata )
 // http://scumways.com/happyhttp/happyhttp.html
 void client::onData( const happyhttp::Response* r, void* userdata, const unsigned char* data, int n )
 {
+    ((client*)userdata)->download_file << "test";
     std::cout << data;
-    ((client*)userdata)->count += n;
+    //((client*)userdata)->count += n;
 }
 
 // http://scumways.com/happyhttp/happyhttp.html
 void client::onComplete( const happyhttp::Response* r, void* userdata )
 {
     std::cout.rdbuf(((client*)userdata)->oldCout);
+    ((client*)userdata)->download_file.close();
 }
 
 // http://scumways.com/happyhttp/happyhttp.html
@@ -62,7 +70,7 @@ void client::send_request()
 {
     happyhttp::Connection conn( site, 80 );
     conn.setcallbacks( onBegin, onData, onComplete, this );
-    conn.request( "GET", site_path );
+    conn.request("GET", site_path);
 
     while( conn.outstanding() )
         conn.pump();
@@ -76,7 +84,7 @@ void client::clean_response()
     std::string end_tag("</osm>");
     auto end = to_be_cleaned.find(end_tag);
 
-    response = to_be_cleaned.substr(0, (end + end_tag.size()));
+    response = to_be_cleaned.substr(0, (end + end_tag.size() + 1));
 }
 
 // From https://code.google.com/p/twitcurl/source/browse/trunk/libtwitcurl/urlencode.cpp?r=47
@@ -112,26 +120,38 @@ void client::execute()
 }
 
 // http://pugixml.org
-std::vector<way> client::parse_response() // Attention aux caracteres speciaux. Seattle fonctionne
+std::vector<way> client::parse_response()
 {
-print();
     pugi::xml_document doc;
-    if (!doc.load_buffer(response.c_str(), response.size())) return std::vector<way>();
-
-    // Parse the xml and store in data structure
-    pugi::xml_node noeud(doc.child("node"));
-    std::cout << noeud.attribute("id").value();
-    std::cout << noeud.text();
-
     std::vector<way> ways;
 
-    // For each way
-    for (pugi::xml_node way = doc.child("node"); way; way = way.next_sibling("node"))
+    auto res = doc.load(response.c_str());
+
+    std::cout << response.substr(0, res.offset + 10);
+    std::cout << res.offset;
+
+    // If we have an error or the map is empty
+    if (!res) return ways;
+
+    // Parse the xml and store in data structure
+    pugi::xml_node osm = doc.child("osm");
+
+    for (pugi::xml_node tool: osm.children("node"))
     {
-        // Extract each node
-        std::cout << "Way : " << way.attribute("id").value() << "\n";
+        std::cout << "Node:";
+
+        for (pugi::xml_attribute attr: tool.attributes())
+        {
+            std::cout << " " << attr.name() << "=" << attr.value();
+        }
+
+        for (pugi::xml_node child: tool.children())
+        {
+            std::cout << ", child " << child.name();
+        }
+        
+        std::cout << std::endl;
     }
-    std::vector<node> path;
 
 
     return ways;

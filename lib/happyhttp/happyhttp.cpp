@@ -439,7 +439,8 @@ void Connection::pump()
 	if( !datawaiting( m_Sock ) )
 		return;				// recv will block
 
-	unsigned char buf[ 2048 ];
+	//unsigned char buf[ 2048 ];
+    unsigned char buf[ 4096 * 16 ];
 	int a = recv( m_Sock, (char*)buf, sizeof(buf), 0 );
 	if( a<0 )
 		BailOnSocketError( "recv()" );

@@ -21,8 +21,8 @@
 
 int main(int argc, const char * argv[])
 {
-    //client request("api06.dev.openstreetmap.org", "/#map=10/44.1334/-70.8037");
-    client request("overpass-api.de", "/api/interpreter?data=node%5B%22name%22%3D%22Seattle%22%5D%3Bout%3B");
+    //client request("overpass-api.de", "/api/interpreter?data=node%5B%22name%22%3D%22Seattle%22%5D%3Bout%3B");
+    client request("overpass-api.de", "/api/interpreter?data=way%2850%2E746%2C7%2E154%2C50%2E748%2C7%2E157%29%3B%28%2E%5F%3B%3E%3B%29%3Bout%20body%3B%0A");
     try {
         request.execute();
     } catch (int e) {

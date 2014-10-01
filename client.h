@@ -10,6 +10,7 @@
 #define __Cartotheque__client__
 
 #include <cstdio>
+#include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -49,6 +50,8 @@ private:
     // Change the cout destination
     std::streambuf* oldCout;
     std::stringstream strCout;
+
+    std::ofstream download_file;
 };
 
 #endif /* defined(__Cartotheque__client__) */
